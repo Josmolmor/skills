@@ -23,13 +23,13 @@ Skills install straight from this repo with the [`skills`](https://github.com/ve
 
 ```bash
 # See what's available
-npx skills@latest add <owner>/<repo> --list
+npx skills@latest add Josmolmor/skills --list
 
 # Install one skill into the current project
-npx skills@latest add <owner>/<repo> --skill rust-egui-guidelines -a claude-code
+npx skills@latest add Josmolmor/skills --skill rust-egui-guidelines -a claude-code
 
 # Install for your user, across all projects
-npx skills@latest add <owner>/<repo> --skill rust-egui-guidelines -a claude-code -g
+npx skills@latest add Josmolmor/skills --skill rust-egui-guidelines -a claude-code -g
 ```
 
 - Leave out `-a` to choose agents interactively (Claude Code, Codex, Cursor, …).
