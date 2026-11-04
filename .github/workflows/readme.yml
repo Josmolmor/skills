@@ -1,0 +1,45 @@
+name: Skills README
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+      - "README.md"
+      - "scripts/update_readme.py"
+  pull_request:
+    paths:
+      - "skills/**"
+      - "README.md"
+      - "scripts/update_readme.py"
+  workflow_dispatch:
+
+jobs:
+  # On pull requests: fail if a skill was added or changed without updating the table.
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/update_readme.py --check
+
+  # On main: regenerate the table and commit it if anything changed.
+  update:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/update_readme.py
+      - name: Commit README if changed
+        run: |
+          if git diff --quiet README.md; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: update skills table"
+          git push
