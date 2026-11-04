@@ -54,6 +54,13 @@ def parse_frontmatter(path: Path) -> dict[str, str]:
 
 
 def build_table() -> str:
+    misplaced = [
+        p.relative_to(ROOT)
+        for p in ROOT.rglob("SKILL.md")
+        if SKILLS_DIR not in p.parents and ".git" not in p.parts
+    ]
+    if misplaced:
+        fail(f"SKILL.md found outside skills/: {', '.join(map(str, misplaced))}. Move it to skills/<name>/SKILL.md")
     rows = []
     for skill_md in sorted(SKILLS_DIR.glob("*/SKILL.md")):
         folder = skill_md.parent.name
