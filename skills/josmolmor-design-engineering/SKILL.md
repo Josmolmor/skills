@@ -54,6 +54,18 @@ If the user explicitly requests implementation, do not stop after presenting a p
 - Respect keyboard interaction, focus visibility, text selection, reduced motion, responsive behavior, and semantic HTML.
 - Prefer the smallest effective change that solves the actual problem.
 
+## Interaction state
+
+When building or changing a stateful interaction (hover cards, popovers, gestures, staged animations, media playback, anything with a timer):
+
+- **Name the phases and events first**, even if only in a comment: `closed → measuring → visible → closing → exiting`. If you can't list them, you don't understand the component yet.
+- **One phase value, not parallel booleans.** Use a discriminated union so impossible combinations can't be represented. Data that only exists in one phase lives in that variant (for example, coordinates only once something has been positioned).
+- **Transitions live in one place.** Handlers, effects, and callbacks dispatch events; they don't set flags. A reducer is usually enough; no library needed.
+- **Late callbacks must be harmless.** Timers, `onAnimationComplete`/`onExitComplete`, promises, and observers are either cancelled when their phase ends, or ignored by the transition when they arrive in the wrong phase (`EXIT_DONE` only counts in `exiting`).
+- **Derive instead of copying.** No ref copies of state written during render. If listeners need the latest value, keep the machine's state in one place and read it there.
+- **Make input modality an explicit dimension.** Fine pointer, touch, and keyboard paths should be visible in the transitions, not scattered across `matchMedia` branches.
+- **Stay proportional.** A single boolean or a one-way flag (thumbnail → playing) is fine as is. Per-frame and per-pointer-event code may stay imperative for performance, but keep its state in one object with a named phase.
+
 ## Additional high-value review checks
 
 Use these checks when relevant; they are prompts for inspection, not rules to apply blindly:
@@ -66,6 +78,7 @@ Use these checks when relevant; they are prompts for inspection, not rules to ap
 - **Transition quality:** Try rapid repeated route changes, returning from deep scroll, and interrupting animations. Prefer instant navigation over slow or fragile motion.
 - **Composition and emphasis:** Inspect actual content shapes, list keylines, code selection, code overflow, image scale, and accent-color frequency. Do not confuse minimalism with undersizing or consistency with sameness.
 - **Site-wide coherence:** Inspect the footer and unusual surfaces, not just the homepage. Ensure contrast, badges, content types, and any OS/terminal motif are either coherent or intentionally varied.
+- **Interaction state:** Does a component with timers, gestures, animation callbacks, or three or more related flags have a single named phase? Look for parallel booleans that can contradict each other (`isOpen && isExiting`), refs copying state, and guards like `if (!a || b || c) return` that secretly mean "only in phase X". Ask "what happens if X during Y?" If answering means tracing several handlers and effects, the state is implicit.
 
 When a report describes a concrete route or asset (for example, a broken image on a specific project), reproduce that exact path and state before making generalized changes. If mobile Safari cannot be tested directly, inspect the implementation and clearly mark runtime behavior as unverified.
 
@@ -101,6 +114,8 @@ Implement the highest-value changes that are well-supported by the evidence. Do 
 
 Reproduce the issue if possible. Trace the event flow, component lifecycle, route state, CSS/layout behavior, and relevant browser conditions. Form a hypothesis, test it, fix the root cause, and retest the original failure case plus nearby regressions.
 
+Symptoms like "sometimes", "after clicking quickly", "gets stuck", "flickers", or "works the second time" usually point to implicit state. List the flags involved, work out which combination was live when it failed, and check which callback fired in the wrong phase.
+
 ## Verification
 
 Use available tools appropriately:
@@ -108,6 +123,7 @@ Use available tools appropriately:
 - Run relevant lint, typecheck, tests, and build scripts when practical.
 - Inspect links and route behavior.
 - Test rapid repeated input and interrupted transitions where relevant.
+- For stateful interactions, run an interrupt matrix: in each phase, send each realistic event. Re-enter during exit, press Escape during a close delay, resize while measuring, scroll while open, double-tap, hide the tab, enable reduced motion mid-animation. The result should be a valid phase every time, never a stuck or invisible one.
 - Check realistic desktop and narrow/mobile viewports.
 - Inspect loading, empty, error, and reduced-motion states when relevant.
 - If browser access is unavailable, state that rendered behavior remains unverified.
