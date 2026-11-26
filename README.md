@@ -16,28 +16,51 @@ Each skill is a folder with a `SKILL.md` file: YAML frontmatter (`name`, `descri
 | --- | --- |
 | [`josmolmor-design-engineering`](skills/josmolmor-design-engineering/SKILL.md) | Audit, refine, debug, and implement high-quality website experiences with strong design and motion judgment. Use when improving an existing UI, portfolio, product website, animation, or frontend repository. |
 | [`rust-egui-guidelines`](skills/rust-egui-guidelines/SKILL.md) | Mandatory rules for any edit or review in the Rust + egui codebase: no unsafe, no new dependencies, enforced lints, ownership, per-frame cost, error display, crate layering, tests and CI gates. |
-| [`website-preview-midjourney`](skills/website-preview-midjourney/SKILL.md) | Inspect a URL or website and create Midjourney prompts for preview, hero, card, or editorial images that visually belong to the page. Extract the page's visual identity, color palette, composition, and image language before writing prompts. |
+| [`website-preview-midjourney`](skills/website-preview-midjourney/SKILL.md) | Turn a website URL into a Midjourney prompt for an image that fits the page's subject, visual identity, and intended image slot. |
 <!-- skills-table:end -->
 
 ## Install
 
-Skills install straight from this repo with the [`skills`](https://github.com/vercel-labs/skills) CLI. No npm package is needed.
+Skills install straight from this repo with the [`skills`](https://github.com/vercel-labs/skills) CLI. No npm package is needed. Replace `<skill-name>` with any skill from the table above.
 
 ```bash
 # See what's available
 npx skills@latest add Josmolmor/skills --list
 
-# Install one skill into the current project
-npx skills@latest add Josmolmor/skills --skill rust-egui-guidelines -a claude-code
+# Install one skill into the current project (the CLI detects your agents, or asks)
+npx skills@latest add Josmolmor/skills --skill <skill-name>
 
 # Install for your user, across all projects
-npx skills@latest add Josmolmor/skills --skill rust-egui-guidelines -a claude-code -g
+npx skills@latest add Josmolmor/skills --skill <skill-name> -g
 ```
 
-- Leave out `-a` to choose agents interactively (Claude Code, Codex, Cursor, …).
+### Pick the agent
+
+Pass `-a` to target a specific agent instead of choosing interactively. Repeat it for several agents, or use `-a '*'` for all of them.
+
+```bash
+# Claude Code
+npx skills@latest add Josmolmor/skills --skill <skill-name> -a claude-code
+
+# Codex
+npx skills@latest add Josmolmor/skills --skill <skill-name> -a codex
+
+# Cursor
+npx skills@latest add Josmolmor/skills --skill <skill-name> -a cursor
+
+# Several at once
+npx skills@latest add Josmolmor/skills --skill <skill-name> -a claude-code -a codex -a cursor
+
+# Every supported agent
+npx skills@latest add Josmolmor/skills --skill <skill-name> -a '*'
+```
+
+Other identifiers include `github-copilot`, `gemini-cli`, `windsurf` and `opencode`. See the [full agent list](https://github.com/vercel-labs/skills/blob/main/docs/agents.md).
+
+- Add `-g` to any of these to install globally instead of per project.
 - Add `--yes` to skip prompts in setup scripts.
 
-**Project vs. global:** for codebase-specific rules like `rust-egui-guidelines`, install at project level and commit the installed folder (for Claude Code, `.claude/skills/`) so everyone working in that repo, and every agent, picks it up.
+**Project vs. global:** for codebase-specific rules, install at project level and commit the installed folder (e.g. `.claude/skills/` or `.agents/skills/`) so everyone working in that repo, and every agent, picks it up. General-purpose skills are usually better installed globally.
 
 ### Manage installed skills
 
@@ -49,14 +72,27 @@ npx skills remove    # uninstall
 
 ### Manual install
 
-Copy the skill folder into your agent's skills directory, e.g. for Claude Code:
+Copy the skill folder into your agent's skills directory:
+
+| Agent | Project | Global |
+| --- | --- | --- |
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
+| Codex | `.agents/skills/` | `~/.agents/skills/` |
+| Cursor | `.agents/skills/` | `~/.cursor/skills/` |
+| GitHub Copilot | `.agents/skills/` | `~/.copilot/skills/` |
+| Gemini CLI | `.agents/skills/` | `~/.gemini/skills/` |
+| Windsurf | `.windsurf/skills/` | `~/.codeium/windsurf/skills/` |
+| OpenCode | `.agents/skills/` | `~/.config/opencode/skills/` |
 
 ```bash
-# Project
-cp -r skills/rust-egui-guidelines .claude/skills/
+# Claude Code, project
+cp -r skills/<skill-name> .claude/skills/
 
-# Global
-cp -r skills/rust-egui-guidelines ~/.claude/skills/
+# Claude Code, global
+cp -r skills/<skill-name> ~/.claude/skills/
+
+# Codex, Cursor, Copilot, Gemini CLI, OpenCode: shared project folder
+cp -r skills/<skill-name> .agents/skills/
 ```
 
 ## Repository layout
