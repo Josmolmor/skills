@@ -1,6 +1,6 @@
 ---
 name: website-preview-midjourney
-version: 1.3.0
+version: 1.4.0
 description: Inspect a website URL and create Midjourney-ready preview image prompts that fit its content and visual identity.
 ---
 
@@ -90,13 +90,26 @@ Use a restrained `--no` list only when it meaningfully prevents likely failure m
 
 Infer the ratio from the actual image slot whenever possible. If the target cannot be identified, use `--ar 16:9`.
 
-Useful starting points:
+Useful starting points (write the parameter as integer `width:height` values):
 
-- Open Graph / link preview: `--ar 1.91:1` or `--ar 16:9`.
-- Hero/banner: `--ar 16:9` or wider if requested.
+- Open Graph / link preview: `--ar 191:100` (approximately 1.91:1) or `--ar 16:9`.
+- Hero/banner: `--ar 16:9` or a wider integer ratio if requested.
 - Article/editorial cover: `--ar 3:2` or `--ar 4:5`.
 - Project/card thumbnail: `--ar 4:3` or `--ar 1:1`.
 - Square tile: `--ar 1:1`.
+
+### Strict aspect-ratio validation
+
+Midjourney aspect-ratio parameters must use the form `--ar width:height`.
+
+- **Use positive whole numbers on both sides of the colon. Do not use decimal values.**
+- Never output malformed ratios such as `--ar 19.1:1`, `--ar 1.91:1`, `--ar 16/9`, `--ar 1,91:1`, or `--ar 1.91`.
+- For a target ratio expressed as a decimal, convert it to an integer ratio before writing the prompt. For example, 1.91:1 becomes `--ar 191:100`; 1.5:1 becomes `--ar 3:2`; 1.333:1 becomes `--ar 4:3`.
+- When the source image slot has known pixel dimensions, use those dimensions as `width:height` and reduce by their greatest common divisor where practical. For example, 1200×630 becomes `--ar 40:21`.
+- If an exact conversion would create unnecessarily large numbers, use a close, simple integer ratio such as `--ar 2:1` or `--ar 16:9`.
+- If the intended ratio cannot be established confidently, use the safe default `--ar 16:9`.
+- Validate every prompt independently. Because the skill returns three prompts by default, all three must contain a valid, complete `--ar width:height` parameter.
+- Preserve a user-specified ratio, but normalize decimal input into integer width:height form. If the user explicitly provides `--ar 4:3`, keep it unchanged.
 
 When an image may be cropped by a card or social platform, keep the main subject inside a center-safe area and avoid tiny details.
 
@@ -201,7 +214,9 @@ Before returning:
 - User-specified constraints are applied.
 - Three genuinely distinct prompt directions are provided by default, unless the user requests a different number.
 - Every prompt is complete, self-contained, and contained in its own easy-to-copy code block.
-- Each prompt includes the correct aspect ratio and all other required parameters.
+- Each prompt includes a valid integer `--ar width:height` parameter; neither side contains decimals.
+- Decimal aspect ratios have been converted to an integer ratio (for example, 1.91:1 → 191:100).
+- Each prompt's aspect-ratio syntax has been checked independently.
 - Analysis and caveats are outside all prompt code blocks.
 - Parameters are supported or conservatively chosen.
 
