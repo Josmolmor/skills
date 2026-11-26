@@ -16,6 +16,7 @@ Each skill is a folder with a `SKILL.md` file: YAML frontmatter (`name`, `descri
 | --- | --- |
 | [`josmolmor-design-engineering`](skills/josmolmor-design-engineering/SKILL.md) | Audit, refine, debug, and implement high-quality website experiences with strong design and motion judgment. Use when improving an existing UI, portfolio, product website, animation, or frontend repository. |
 | [`rust-egui-guidelines`](skills/rust-egui-guidelines/SKILL.md) | Mandatory rules for any edit or review in the Rust + egui codebase: no unsafe, no new dependencies, enforced lints, ownership, per-frame cost, error display, crate layering, tests and CI gates. |
+| [`website-preview-midjourney`](skills/website-preview-midjourney/SKILL.md) | Inspect a URL or website and create Midjourney prompts for preview, hero, card, or editorial images that visually belong to the page. Extract the page's visual identity, color palette, composition, and image language before writing prompts. |
 <!-- skills-table:end -->
 
 ## Install
