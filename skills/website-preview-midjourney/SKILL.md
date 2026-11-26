@@ -1,6 +1,6 @@
 ---
 name: website-preview-midjourney
-version: 1.2.0
+version: 1.3.0
 description: Inspect a website URL and create Midjourney-ready preview image prompts that fit its content and visual identity.
 ---
 
@@ -24,7 +24,7 @@ The image should feel native to the website without recreating the webpage, its 
 2. Understand the page's subject and the role of the intended preview image.
 3. Extract the visual identity: palette, contrast, medium, shapes, materials, lighting, texture, mood, and composition.
 4. Infer the target image slot and aspect ratio from the page when possible. If unclear, default to `--ar 16:9`.
-5. Create one strong, concise, ready-to-paste Midjourney prompt.
+5. Create three genuinely distinct, ready-to-paste Midjourney prompts by default, each exploring a different creative direction while preserving the website's visual identity.
 6. Keep analysis and the prompt clearly separated in the output format below.
 7. Do not ask for optional details. User-specified requirements override inferred defaults.
 
@@ -117,7 +117,7 @@ Check current Midjourney documentation when parameter syntax or model compatibil
 
 ## Mandatory response format
 
-Always use the following hierarchy. The user must be able to identify and copy the final Midjourney prompt immediately.
+Always use the following hierarchy. The user must be able to identify and copy each Midjourney prompt immediately. Preserve the detailed visual analysis; the goal is to make the copy-ready prompts easier to find, not to remove creative exploration or process information.
 
 ### 1. Visual analysis
 
@@ -129,18 +129,27 @@ Give a concise but useful summary of:
 
 This section may contain process details and caveats, but keep it readable. Do not let it bury the final prompt.
 
-### 2. Midjourney prompt
+### 2. Midjourney prompts
 
 This must be the most visually prominent and easiest-to-copy section of the response.
 
-- Use the exact heading `## Midjourney prompt`.
-- Put the complete final prompt in a single fenced code block with a `text` language tag.
-- The code block must contain only the prompt itself: no introduction, labels, quotation marks, commentary, bullet points, or explanations.
-- Include all required Midjourney parameters in the code block.
-- Do not split one prompt across multiple code blocks.
-- Do not place analysis, caveats, optional edits, or notes inside the code block.
-- If producing multiple prompts because the user explicitly asked for variants, give each a clearly numbered heading and its own complete code block.
-- Do not use a WritingBlock or other UI format instead of the code block; the code block is the copy-ready prompt.
+- Use the exact heading `## Midjourney prompts`.
+- Produce **three prompts by default**. The user should not need to request variants.
+- The three prompts must explore genuinely different creative directions, not merely rephrase the same concept or swap a few adjectives.
+- Use these creative roles as a starting point:
+  1. **Closest match:** the strongest and most faithful translation of the website's subject and visual identity.
+  2. **Creative interpretation:** a more unexpected, expressive, or metaphorical concept that still feels native to the website.
+  3. **Alternative direction:** a meaningfully different composition, visual metaphor, or medium that remains appropriate for the page.
+- Adapt those roles when another set of three directions would better suit the page. Do not force an unsuitable direction merely to satisfy a label.
+- Give each prompt its own clearly numbered subheading, such as `### 1. Closest match`, `### 2. Creative interpretation`, and `### 3. Alternative direction`.
+- Put each complete prompt in its own fenced code block with a `text` language tag.
+- Each code block must contain only that prompt: no introduction, labels, quotation marks, commentary, bullet points, or explanations.
+- Each prompt must be independently usable: include its subject, visual treatment, composition, and all required Midjourney parameters. The user must be able to copy any single code block and paste it directly into Midjourney without combining it with another prompt or with the analysis.
+- Apply all user-specified requirements consistently to all three prompts unless the user explicitly asks for a particular requirement to apply only to one direction.
+- Include the inferred or requested aspect ratio in every prompt. Do not omit parameters from later variants just because they appeared in the first.
+- Do not put analysis, caveats, optional edits, or notes inside any prompt code block.
+- If the user explicitly requests a different number of prompts, follow that request. If they explicitly request only one, produce one. If they request more than three, provide the requested number while keeping each direction meaningfully distinct.
+- Do not use a WritingBlock or other UI format instead of code blocks; code blocks are the copy-ready prompts.
 
 ### 3. Style reference
 
@@ -150,7 +159,7 @@ If useful, provide the screenshot path or URL exactly as observed and explain in
 
 Put caveats, assumptions, optional prompt edits, and uncertainties here. Clearly distinguish optional suggestions from the final prompt. Do not ask the user to manually edit the prompt unless explaining a genuinely optional adjustment.
 
-The default response should include analysis and relevant notes, but avoid lengthy tutorials or generic advice.
+The default response should include useful analysis, three distinct copy-ready prompts, relevant Style Reference recommendations, and material notes. Avoid lengthy tutorials or generic advice. Do not shorten the creative exploration simply to make the output more compact.
 
 ## Handling user overrides
 
@@ -190,8 +199,10 @@ Before returning:
 - Composition suits the target image slot and likely crop.
 - The image does not recreate the website or its UI.
 - User-specified constraints are applied.
-- The final prompt is complete, concise, and contained in one easy-to-copy code block.
-- Analysis and caveats are outside the prompt code block.
+- Three genuinely distinct prompt directions are provided by default, unless the user requests a different number.
+- Every prompt is complete, self-contained, and contained in its own easy-to-copy code block.
+- Each prompt includes the correct aspect ratio and all other required parameters.
+- Analysis and caveats are outside all prompt code blocks.
 - Parameters are supported or conservatively chosen.
 
 ## Official Midjourney references
